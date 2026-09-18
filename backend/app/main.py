@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from routers import skill
+from app.routers import skill_router
 import logging
 
 logger = logging.getLogger()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,7 +31,7 @@ app = FastAPI(
 
 # API Version 1
 app.include_router(
-    skill.router,
+    skill_router.router,
     prefix="/v1",
 )
 

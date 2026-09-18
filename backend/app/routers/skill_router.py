@@ -1,30 +1,44 @@
-from fastapi import APIRouter
+import logging
+
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.skill_schema import (
     SkillGenerateRequest,
     SkillGenerateResponse,
 )
 from app.services import skill_service
-import logging
 
 logger = logging.getLogger()
-router = APIRouter(prefix="/skills", tags=["skills"],)
 
-@router.post("/generate", response_model=SkillGenerateResponse,)
+router = APIRouter(
+    prefix="/skills",
+    tags=["skills"],
+)
+
+
+@router.post(
+    "/generate",
+    response_model=SkillGenerateResponse,
+)
 def generate_skill(request: SkillGenerateRequest):
     """
     Skill.mdを生成するAPI。
     """
     try:
-        logger.info("[Info] Skill.mdを生成します。")
+        logger.info("[Info] Skill.mdの生成を開始します。")
 
         response = skill_service.generate_skill(request)
 
-        logger.info("[Info] Skill.mdを生成が完了しました。")
-        
+        logger.info("[Info] Skill.mdの生成が完了しました。")
+
         return SkillGenerateResponse(
-            content="生成されたSkill.mdの内容"
+            content=response,
         )
 
-    except Exception as e:
-        return e
+    except Exception:
+        logger.exception("[Error] Skill.mdの生成中にエラーが発生しました。")
+
+        raise HTTPException(
+            status_code=500,
+            detail="Skill.mdの生成に失敗しました。",
+        )

@@ -1,8 +1,5 @@
 def create_skill_prompt(data):
-    instructions = "\n".join(
-        f"{index}. {instruction}"
-        for index, instruction in enumerate(data.instructions, start=1)
-    )
+    instructions = "\n".join(f"{index}. {instruction}" for index, instruction in enumerate(data.instructions, start=1))
 
     return f"""
 あなたは、Agent Skills仕様に準拠したSKILL.mdを作成するアシスタントです。

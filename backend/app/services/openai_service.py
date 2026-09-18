@@ -49,10 +49,7 @@ def generate_with_openai(prompt: str) -> str:
         raise
 
     except openai.APIStatusError as e:
-        logger.error(
-            f"OpenAI APIでエラーが発生しました: "
-            f"status_code={e.status_code}, error={e}"
-        )
+        logger.error(f"OpenAI APIでエラーが発生しました: " f"status_code={e.status_code}, error={e}")
         raise
 
     except openai.APIError as e:

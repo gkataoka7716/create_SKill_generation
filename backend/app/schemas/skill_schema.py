@@ -1,10 +1,15 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import Annotated
 
+
 class SkillGenerateRequest(BaseModel):
     """Skill.md生成APIのリクエスト"""
 
-    name: str = Field(min_length=1, max_length=64, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",)
+    name: str = Field(
+        min_length=1,
+        max_length=64,
+        pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
+    )
     description: str = Field(min_length=1, max_length=1024)
     instructions: list[Annotated[str, Field(min_length=1)]] = Field(min_length=1)
 
@@ -17,7 +22,6 @@ class SkillGenerateRequest(BaseModel):
     @classmethod
     def strip_instructions(cls, value: list[str]) -> list[str]:
         return [instruction.strip() for instruction in value]
-
 
 
 class SkillGenerateResponse(BaseModel):
