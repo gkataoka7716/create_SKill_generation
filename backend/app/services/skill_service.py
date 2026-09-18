@@ -15,4 +15,5 @@ def generate_skill(request: SkillGenerateRequest):
         return response
 
     except Exception as e:
+        logger.exception("Skill.md生成中に予期しないエラーが発生しました")
         raise 
