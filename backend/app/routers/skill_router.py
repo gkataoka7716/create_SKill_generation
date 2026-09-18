@@ -1,4 +1,5 @@
 import logging
+import time
 
 from fastapi import APIRouter, HTTPException
 
@@ -24,6 +25,10 @@ def generate_skill(request: SkillGenerateRequest):
     """
     Skill.mdを生成するAPI。
     """
+
+    # 時間の計測
+    start = time.perf_counter()
+
     try:
         logger.info("[Info] Skill.mdの生成を開始します。")
 
@@ -42,3 +47,7 @@ def generate_skill(request: SkillGenerateRequest):
             status_code=500,
             detail="Skill.mdの生成に失敗しました。",
         )
+    finally:
+        # 計測終了
+        elapsed = time.perf_counter() - start
+        logger.info(f"[Info] 生成時間は{elapsed:.3f}秒です")
