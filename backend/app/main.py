@@ -2,23 +2,13 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-# Router
-# from routers import skill_router
+from routers import skill
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    FastAPIの起動時・終了時に実行する処理。
-
-    起動時：
-    - DBの初期化
-    - 必要なファイル・ディレクトリの作成
-    - 初期データの登録
-
-    終了時：
-    - DB接続の終了
-    - リソースの解放
+    FastAPI起動時・終了時に実行する処理。
     """
 
     # ===== 起動時処理 =====
@@ -38,11 +28,14 @@ app = FastAPI(
 )
 
 
-# Routerを登録
-# app.include_router(skill_router.router)
+# API Version 1
+app.include_router(
+    skill.router,
+    prefix="/v1",
+)
 
 
-@app.get("/")
+@app.get("/health")
 def root():
     """APIの動作確認用エンドポイント"""
     return {"message": "Skill.md Generator API"}
