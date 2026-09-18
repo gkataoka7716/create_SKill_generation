@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
-
 from routers import skill
+import logging
 
+logger = logging.getLogger()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -12,12 +12,12 @@ async def lifespan(app: FastAPI):
     """
 
     # ===== 起動時処理 =====
-    print("Skill.md Generator APIを起動しました")
+    logger.info("[info] Skill.md Generator APIを起動しました")
 
     yield
 
     # ===== 終了時処理 =====
-    print("Skill.md Generator APIを終了します")
+    logger.info("[info] Skill.md Generator APIを終了します")
 
 
 app = FastAPI(

@@ -16,8 +16,12 @@ def generate_skill(request: SkillGenerateRequest):
     Skill.mdを生成するAPI。
     """
     try:
+        logger.info("[Info] Skill.mdを生成します。")
+
         response = skill_service.generate_skill(request)
 
+        logger.info("[Info] Skill.mdを生成が完了しました。")
+        
         return SkillGenerateResponse(
             content="生成されたSkill.mdの内容"
         )

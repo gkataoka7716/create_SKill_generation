@@ -9,6 +9,7 @@ def generate_skill(request: SkillGenerateRequest):
     try:
         prompt = create_skill_prompt(request)
 
+        logger.info("[Info] Skill.mdの生成を開始します")
         response = generate_with_openai(prompt)
 
         return response
