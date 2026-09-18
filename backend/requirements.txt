@@ -1,8 +1,17 @@
-fastapifastapi
+# Web Framework
+fastapi
 uvicorn[standard]
 
-sqlalchemy
-psycopg2-binary
+# OpenAI
+openai
 
+# Testing
 pytest
 httpx
+
+# Code Formatting
+black
+
+# Database
+sqlalchemy
+psycopg2-binary
