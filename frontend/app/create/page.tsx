@@ -36,14 +36,12 @@ export default function PromptCreatePage() {
 
   // Instructionsが1件以上入力されているか
   const hasInstructions = instructions.some(
-    (instruction) =>
-      instruction.value.trim() !== "",
+    (instruction) => instruction.value.trim() !== "",
   );
 
   // 空のInstructionsが存在するか
   const hasEmptyInstruction = instructions.some(
-    (instruction) =>
-      instruction.value.trim() === "",
+    (instruction) => instruction.value.trim() === "",
   );
 
   // 作成可能か
@@ -75,10 +73,7 @@ export default function PromptCreatePage() {
     const data = {
       name: name.trim(),
       description: description.trim(),
-      instructions: instructions.map(
-        (instruction) =>
-          instruction.value.trim(),
-      ),
+      instructions: instructions.map((instruction) => instruction.value.trim()),
     };
 
     console.log("作成:", data);
@@ -90,23 +85,15 @@ export default function PromptCreatePage() {
         <div className="rounded-xl bg-white shadow-sm">
           {/* ヘッダー */}
           <div className="border-b border-gray-200 px-8 py-6">
-            <h1 className="text-2xl font-bold text-gray-800">
-              プロンプト作成
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-800">プロンプト作成</h1>
           </div>
 
           <div className="space-y-8 p-8">
             {/* 名前 */}
-            <NameInput
-              value={name}
-              onChange={setName}
-            />
+            <NameInput value={name} onChange={setName} />
 
             {/* 説明 */}
-            <DescriptionInput
-              value={description}
-              onChange={setDescription}
-            />
+            <DescriptionInput value={description} onChange={setDescription} />
 
             {/* Instructions */}
             <InstructionsInput

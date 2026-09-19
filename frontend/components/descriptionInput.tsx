@@ -25,9 +25,7 @@ export default function DescriptionInput({
           Description
         </label>
 
-        <span className="text-xs font-medium text-red-500">
-          *
-        </span>
+        <span className="text-xs font-medium text-red-500">*</span>
 
         <span className="ml-2">
           <HelpPopover
@@ -53,11 +51,7 @@ export default function DescriptionInput({
       />
 
       {/* エラーメッセージ */}
-      {error && (
-        <p className="text-xs text-red-500">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

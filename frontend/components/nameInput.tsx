@@ -8,32 +8,23 @@ type NameInputProps = {
   onChange: (value: string) => void;
 };
 
-export default function NameInput({
-  value,
-  onChange,
-}: NameInputProps) {
+export default function NameInput({ value, onChange }: NameInputProps) {
   const error = getNameError(value);
 
   return (
     <div className="space-y-2">
       {/* ラベル */}
       <div className="flex items-center">
-        <label
-          htmlFor="name"
-          className="text-sm font-semibold text-gray-700"
-        >
+        <label htmlFor="name" className="text-sm font-semibold text-gray-700">
           Name
         </label>
 
-        <span className="text-xs font-medium text-red-500">
-          *
-        </span>
+        <span className="text-xs font-medium text-red-500">*</span>
 
         <span className="ml-2">
           <HelpPopover
             title="Nameについて"
             description="Skillの名前を入力してください。3〜20文字で、英字・数字・アンダースコア（_）のみ使用できます。空欄やスペース、日本語、その他の記号は使用できません。"
-
           />
         </span>
       </div>
@@ -55,11 +46,7 @@ export default function NameInput({
       />
 
       {/* エラーメッセージ */}
-      {error && (
-        <p className="text-xs text-red-500">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

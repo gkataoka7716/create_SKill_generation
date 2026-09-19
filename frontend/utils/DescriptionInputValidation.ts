@@ -1,6 +1,4 @@
-export function getDescriptionError(
-  value: string,
-): string | null {
+export function getDescriptionError(value: string): string | null {
   // 未入力の場合はエラーを表示しない
   if (value.length === 0) {
     return null;

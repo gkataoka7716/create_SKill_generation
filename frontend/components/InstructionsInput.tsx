@@ -42,17 +42,13 @@ export default function InstructionsInput({
   const updateInstruction = (id: number, text: string) => {
     onChange(
       value.map((instruction) =>
-        instruction.id === id
-          ? { ...instruction, value: text }
-          : instruction,
+        instruction.id === id ? { ...instruction, value: text } : instruction,
       ),
     );
   };
 
   const deleteInstruction = (id: number) => {
-    const index = value.findIndex(
-      (instruction) => instruction.id === id,
-    );
+    const index = value.findIndex((instruction) => instruction.id === id);
 
     if (index === -1) {
       return;
@@ -103,13 +99,9 @@ export default function InstructionsInput({
     <div>
       {/* ラベル */}
       <div className="mb-3 flex items-center">
-        <h2 className="text-sm font-semibold text-gray-700">
-          Instructions
-        </h2>
+        <h2 className="text-sm font-semibold text-gray-700">Instructions</h2>
 
-        <span className="text-xs font-medium text-red-500">
-          *
-        </span>
+        <span className="text-xs font-medium text-red-500">*</span>
 
         <span className="ml-2">
           <HelpPopover
@@ -123,14 +115,10 @@ export default function InstructionsInput({
       <div className="space-y-3">
         {value.map((instruction, index) => {
           const hasError =
-            value.length > 1 &&
-            instruction.value.trim().length === 0;
+            value.length > 1 && instruction.value.trim().length === 0;
 
           return (
-            <div
-              key={instruction.id}
-              className="flex items-center gap-2"
-            >
+            <div key={instruction.id} className="flex items-center gap-2">
               {/* 行番号 */}
               <div className="flex h-11 w-10 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-50 text-sm font-medium text-gray-500">
                 {index + 1}
@@ -141,10 +129,7 @@ export default function InstructionsInput({
                 type="text"
                 value={instruction.value}
                 onChange={(e) =>
-                  updateInstruction(
-                    instruction.id,
-                    e.target.value,
-                  )
+                  updateInstruction(instruction.id, e.target.value)
                 }
                 placeholder="指示内容を入力"
                 className={`h-11 w-full rounded-md border px-4 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 ${
@@ -157,9 +142,7 @@ export default function InstructionsInput({
               {/* 削除ボタン */}
               <button
                 type="button"
-                onClick={() =>
-                  deleteInstruction(instruction.id)
-                }
+                onClick={() => deleteInstruction(instruction.id)}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-500"
                 aria-label={`${index + 1}行目を削除`}
               >
@@ -172,9 +155,7 @@ export default function InstructionsInput({
 
       {/* エラーメッセージ */}
       {instructionsError && (
-        <p className="mt-2 text-sm text-red-500">
-          {instructionsError}
-        </p>
+        <p className="mt-2 text-sm text-red-500">{instructionsError}</p>
       )}
 
       {/* 操作ボタン */}
