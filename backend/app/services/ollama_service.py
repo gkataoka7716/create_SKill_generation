@@ -1,12 +1,13 @@
-from ollama import generate
+from ollama import Client
 
 
-def generate_with_ollama(prompt: str, model: str) -> str:
-    """Ollamaを使用してプロンプトを実行する"""
+client = Client(host="http://ollama:11434")
 
-    response = generate(
+
+def generate_with_ollama(prompt: str, model: str):
+    response = client.generate(
         model=model,
         prompt=prompt,
     )
-
+    
     return response["response"]
