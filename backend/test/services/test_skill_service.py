@@ -17,11 +17,41 @@ def valid_request():
             "ユーザーの質問を確認する",
             "必要な情報をWeb検索する",
         ],
+        ai_provider="ollama",
+        ai_model="llama3.2",
     )
 
 
-def test_generate_skill(valid_request):
-    """Skill.mdを正常に生成して結果を返すこと"""
+@pytest.mark.parametrize(
+    ("ai_provider", "ai_model", "service_path"),
+    [
+        (
+            "openai",
+            "gpt-5",
+            "app.services.skill_service.openai_service.generate_with_openai",
+        ),
+        (
+            "gemini",
+            "gemini-2.5-flash",
+            "app.services.skill_service.gemini_service.generate_with_gemini",
+        ),
+        (
+            "ollama",
+            "llama3.2",
+            "app.services.skill_service.ollama_service.generate_with_ollama",
+        ),
+    ],
+)
+def test_generate_skill_success(
+    valid_request,
+    ai_provider,
+    ai_model,
+    service_path,
+):
+    """指定したAI Providerのサービスが呼び出されること"""
+
+    valid_request.ai_provider = ai_provider
+    valid_request.ai_model = ai_model
 
     mock_prompt = "生成用プロンプト"
     mock_response = "# Skill\n\n生成されたSkill.md"
@@ -32,20 +62,26 @@ def test_generate_skill(valid_request):
             return_value=mock_prompt,
         ) as mock_create_prompt,
         patch(
-            "app.services.skill_service.generate_with_openai",
+            service_path,
             return_value=mock_response,
         ) as mock_generate,
     ):
         response = skill_service.generate_skill(valid_request)
 
     mock_create_prompt.assert_called_once_with(valid_request)
-    mock_generate.assert_called_once_with(mock_prompt)
+    mock_generate.assert_called_once_with(
+        mock_prompt,
+        valid_request.ai_model,
+    )
 
     assert response == mock_response
 
 
 def test_generate_skill_error(valid_request):
     """Skill.md生成中にエラーが発生した場合、例外が再送出されること"""
+
+    valid_request.ai_provider = "openai"
+    valid_request.ai_model = "gpt-5"
 
     error = Exception("OpenAI API error")
 
@@ -55,7 +91,7 @@ def test_generate_skill_error(valid_request):
             return_value="生成用プロンプト",
         ),
         patch(
-            "app.services.skill_service.generate_with_openai",
+            "app.services.skill_service.openai_service.generate_with_openai",
             side_effect=error,
         ),
     ):
