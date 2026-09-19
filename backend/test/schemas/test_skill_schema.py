@@ -12,13 +12,7 @@ from app.schemas.skill_schema import (
 
 
 def create_valid_request(**overrides):
-    data = {
-        "name": "web-research",
-        "description": "Web検索を行うSkill。",
-        "instructions": ["Web検索する"],
-        "ai_provider": "ollama",
-        "ai_model": "llama3.2"
-    }
+    data = {"name": "web-research", "description": "Web検索を行うSkill。", "instructions": ["Web検索する"], "ai_provider": "ollama", "ai_model": "llama3.2"}
 
     data.update(overrides)
 
@@ -132,9 +126,11 @@ def test_instructions_validation(instructions, is_valid):
         with pytest.raises(ValidationError):
             create_valid_request(instructions=instructions)
 
+
 # ------------------------
 #   ai_providerのバリデーション
 # ------------------------
+
 
 @pytest.mark.parametrize(
     "ai_provider, is_valid",
@@ -180,17 +176,16 @@ def test_ai_provider_validation(ai_provider, is_valid):
 #   ai_modelのバリデーション
 # ---------------------
 
+
 @pytest.mark.parametrize(
     "ai_provider, ai_model, is_valid",
     [
         # OpenAI
         ("openai", "gpt-5.6", True),
         ("openai", "invalid-model", False),
-
         # Gemini
         ("gemini", "gemini-3.8-flash", True),
         ("gemini", "invalid-model", False),
-
         # Ollama
         ("ollama", "llama3.2", True),
         ("ollama", "invalid-model", False),

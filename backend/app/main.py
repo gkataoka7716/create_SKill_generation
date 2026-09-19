@@ -4,7 +4,6 @@ from app.routers import skill_router
 import logging
 from ollama import AsyncClient
 
-
 logger = logging.getLogger()
 
 

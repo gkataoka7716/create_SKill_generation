@@ -53,10 +53,7 @@ class SkillGenerateRequest(BaseModel):
     @classmethod
     def strip_instructions(cls, value: Any) -> Any:
         if isinstance(value, list):
-            return [
-                instruction.strip() if isinstance(instruction, str) else instruction
-                for instruction in value
-            ]
+            return [instruction.strip() if isinstance(instruction, str) else instruction for instruction in value]
 
         return value
 
@@ -71,10 +68,7 @@ class SkillGenerateRequest(BaseModel):
         model_type = valid_models[self.ai_provider]
 
         if self.ai_model not in [model.value for model in model_type]:
-            raise ValueError(
-                f"{self.ai_provider.value}では利用できないモデルです: "
-                f"{self.ai_model}"
-            )
+            raise ValueError(f"{self.ai_provider.value}では利用できないモデルです: " f"{self.ai_model}")
 
         return self
 
