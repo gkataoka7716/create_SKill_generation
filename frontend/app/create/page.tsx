@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { RotateCcw } from "lucide-react";
 
 import NameInput from "@/components/nameInput";
 import DescriptionInput from "@/components/descriptionInput";
 import InstructionsInput from "@/components/InstructionsInput";
+import AIModelSelect from "@/components/aiModelSelect";
+
 import { getNameError } from "@/utils/NameInputValidation";
 import { getDescriptionError } from "@/utils/DescriptionInputValidation";
 import { getInstructionsError } from "@/utils/InstructionsInputValidation";
@@ -16,7 +19,20 @@ type Instruction = {
   value: string;
 };
 
+type AIModel = {
+  provider: string;
+  model: string;
+  label: string;
+};
+
 export default function PromptCreatePage() {
+  const router = useRouter();
+  const [selectedModel, setSelectedModel] = useState<AIModel>({
+    provider: "ollama",
+    model: "llama3.2",
+    label: "Llama 3.2",
+  });
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -29,6 +45,8 @@ export default function PromptCreatePage() {
 
   // Instructionsを初期状態に戻すためのキー
   const [instructionsResetKey, setInstructionsResetKey] = useState(0);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // バリデーションエラー
   const nameError = getNameError(name);
@@ -57,6 +75,40 @@ export default function PromptCreatePage() {
     hasInstructions &&
     !hasEmptyInstruction &&
     instructionsError === null;
+  
+  useEffect(() => {
+    const data = sessionStorage.getItem("skillInput");
+
+    const hydrationTimer = window.setTimeout(() => {
+      if (!data) {
+        setIsHydrated(true);
+        return;
+      }
+
+      try {
+        const saved = JSON.parse(data);
+
+        setName(saved.name ?? "");
+        setDescription(saved.description ?? "");
+        setInstructions(
+          saved.instructions ?? [{ id: Date.now(), value: "" }],
+        );
+        setSelectedModel(
+          saved.selectedModel ?? {
+            provider: "ollama",
+            model: "llama3.2",
+            label: "Llama 3.2",
+          },
+        );
+      } catch (error) {
+        console.error("入力内容の復元に失敗しました:", error);
+      } finally {
+        setIsHydrated(true);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(hydrationTimer);
+  }, []);
 
   // すべてリセット
   const resetAll = () => {
@@ -72,27 +124,54 @@ export default function PromptCreatePage() {
 
     // InstructionsInputを再生成して初期状態に戻す
     setInstructionsResetKey((prev) => prev + 1);
+
+    // AIモデルは初期値のOllama / Llama 3.2のまま
+    setSelectedModel({
+      provider: "ollama",
+      model: "llama3.2",
+      label: "Llama 3.2",
+    });
   };
 
   const handleCreate = async () => {
-    if (!isFormValid) {
+    if (!isFormValid || isSubmitting) {
       return;
     }
 
+    const inputSnapshot = {
+      name,
+      description,
+      instructions: instructions.map((instruction) => ({ ...instruction })),
+      selectedModel: { ...selectedModel },
+    };
+
     const data = {
-      name: name.trim(),
-      description: description.trim(),
-      instructions: instructions.map(
+      name: inputSnapshot.name.trim(),
+      description: inputSnapshot.description.trim(),
+      instructions: inputSnapshot.instructions.map(
         (instruction) => instruction.value.trim(),
       ),
+      ai_provider: inputSnapshot.selectedModel.provider,
+      ai_model: inputSnapshot.selectedModel.model,
     };
+
+    // 再修正用に入力内容を保存
+    sessionStorage.setItem("skillInput", JSON.stringify(inputSnapshot));
+    setIsSubmitting(true);
 
     try {
       const result = await createSkill(data);
 
-      console.log("作成成功:", result);
+      sessionStorage.setItem(
+        "skillResult",
+        JSON.stringify(result),
+      );
+
+      router.push("/result");
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -101,10 +180,15 @@ export default function PromptCreatePage() {
       <div className="mx-auto w-full max-w-3xl">
         <div className="rounded-xl bg-white shadow-sm">
           {/* ヘッダー */}
-          <div className="border-b border-gray-200 px-8 py-6">
+          <div className="flex items-center justify-between border-b border-gray-200 px-8 py-6">
             <h1 className="text-2xl font-bold text-gray-800">
               プロンプト作成
             </h1>
+
+            <AIModelSelect
+              value={selectedModel.model}
+              onChange={setSelectedModel}
+            />
           </div>
 
           <div className="space-y-8 p-8">
@@ -140,10 +224,10 @@ export default function PromptCreatePage() {
               <button
                 type="button"
                 onClick={handleCreate}
-                disabled={!isFormValid}
+                disabled={!isHydrated || !isFormValid || isSubmitting}
                 className="rounded-md bg-blue-600 px-8 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                作成
+                {isSubmitting ? "作成中..." : "作成"}
               </button>
             </div>
           </div>

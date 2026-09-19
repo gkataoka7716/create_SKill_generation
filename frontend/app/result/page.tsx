@@ -1,21 +1,43 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Copy, RotateCcw, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-type PromptResultPageProps = {
-  contents: string;
+type SkillResult = {
+  content: string;
 };
 
-export default function PromptResultPage({
-  contents,
-}: PromptResultPageProps) {
+export default function PromptResultPage() {
   const router = useRouter();
+
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    const data = sessionStorage.getItem("skillResult");
+
+    const resultTimer = window.setTimeout(() => {
+      if (!data) {
+        console.error("skillResultが見つかりません");
+        return;
+      }
+
+      try {
+        const result: SkillResult = JSON.parse(data);
+
+        setContent(result.content);
+      } catch (error) {
+        console.error("結果の読み込みに失敗しました:", error);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(resultTimer);
+  }, []);
 
   // コピー
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(contents);
+      await navigator.clipboard.writeText(content);
       console.log("コピーしました");
     } catch (error) {
       console.error("コピーに失敗しました:", error);
@@ -24,17 +46,13 @@ export default function PromptResultPage({
 
   // 初めからやり直す
   const handleReset = () => {
-    // 保存している入力内容を削除
-    sessionStorage.removeItem("promptInput");
-
-    // 入力画面へ戻る
+    sessionStorage.removeItem("skillResult");
+    sessionStorage.removeItem("skillInput");
     router.push("/create");
   };
 
   // 再修正する
   const handleEdit = () => {
-    // 入力内容はsessionStorageに残したまま
-    // 入力画面へ戻る
     router.push("/create");
   };
 
@@ -50,16 +68,15 @@ export default function PromptResultPage({
           </div>
 
           <div className="space-y-8 p-8">
-            {/* contents */}
+            {/* 実行結果 */}
             <div>
               <h2 className="mb-3 text-sm font-semibold text-gray-700">
                 実行結果
               </h2>
 
               <div className="overflow-hidden rounded-md border border-gray-300 bg-gray-900">
-                {/* contents本体 */}
                 <pre className="min-h-48 overflow-x-auto whitespace-pre-wrap px-4 py-4 font-mono text-sm leading-7 text-gray-100">
-                  {contents}
+                  {content}
                 </pre>
 
                 {/* コピー */}
