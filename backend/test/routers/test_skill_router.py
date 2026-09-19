@@ -27,6 +27,8 @@ def test_generate_skill(client):
             "ユーザーの質問を確認する",
             "必要な情報をWeb検索する",
         ],
+        "ai_provider": "ollama",
+        "ai_model": "llama3.2",
     }
 
     mock_response = "# Skill\n\n生成されたSkill.md"
@@ -57,6 +59,8 @@ def test_generate_skill_passes_request(client):
         "instructions": [
             "ユーザーの質問を確認する",
         ],
+        "ai_provider": "ollama",
+        "ai_model": "llama3.2",
     }
 
     with patch(
@@ -86,6 +90,8 @@ def test_generate_skill_error(client):
         "instructions": [
             "ユーザーの質問を確認する",
         ],
+        "ai_provider": "ollama",
+        "ai_model": "llama3.2",
     }
 
     with patch(
