@@ -1,8 +1,12 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from app.routers import skill_router
 import logging
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from ollama import AsyncClient
+
+from app.routers import skill_router
+
 
 logger = logging.getLogger()
 
@@ -30,7 +34,19 @@ app = FastAPI(
 )
 
 
-# API Version 1
+# ===== CORS設定 =====
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# ===== API Version 1 =====
 app.include_router(
     skill_router.router,
     prefix="/v1",

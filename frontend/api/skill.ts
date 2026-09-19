@@ -2,6 +2,8 @@ type CreateSkillRequest = {
   name: string;
   description: string;
   instructions: string[];
+  ai_provider: string,
+  ai_model: string
 };
 
 type CreateSkillResponse = {
