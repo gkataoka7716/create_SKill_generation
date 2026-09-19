@@ -49,12 +49,15 @@ def test_generate_skill_error(valid_request):
 
     error = Exception("OpenAI API error")
 
-    with patch(
-        "app.services.skill_service.create_skill_prompt",
-        return_value="生成用プロンプト",
-    ), patch(
-        "app.services.skill_service.generate_with_openai",
-        side_effect=error,
+    with (
+        patch(
+            "app.services.skill_service.create_skill_prompt",
+            return_value="生成用プロンプト",
+        ),
+        patch(
+            "app.services.skill_service.generate_with_openai",
+            side_effect=error,
+        ),
     ):
         with pytest.raises(Exception, match="OpenAI API error"):
             skill_service.generate_skill(valid_request)
