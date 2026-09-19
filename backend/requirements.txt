@@ -2,8 +2,10 @@
 fastapi
 uvicorn[standard]
 
-# OpenAI
+# AIModels
 openai
+ollama
+google-genai
 
 # Testing
 pytest
