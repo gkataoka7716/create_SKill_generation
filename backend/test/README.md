@@ -5,7 +5,7 @@
 `SkillGenerateRequest`、`SkillGenerateResponse` のバリデーションテストを実行します。
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec backend pytest test/schemas/test_skill_schema.py -v
+docker compose -f docker-compose.dev.yaml exec backend python -m pytest test/schemas/test_skill_schema.py -v
 ```
 
 ### 全テスト
@@ -13,7 +13,7 @@ docker compose -f docker-compose.dev.yaml exec backend pytest test/schemas/test_
 プロジェクト内のすべてのpytestを実行します。
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec backend pytest -v
+docker compose -f docker-compose.dev.yaml exec backend python -m pytest -v
 ```
 
 ## コード整形
