@@ -9,6 +9,7 @@ import InstructionsInput from "@/components/InstructionsInput";
 import { getNameError } from "@/utils/NameInputValidation";
 import { getDescriptionError } from "@/utils/DescriptionInputValidation";
 import { getInstructionsError } from "@/utils/InstructionsInputValidation";
+import { createSkill } from "@/api/skill";
 
 type Instruction = {
   id: number;
@@ -65,7 +66,7 @@ export default function PromptCreatePage() {
     ]);
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!isFormValid) {
       return;
     }
@@ -76,7 +77,13 @@ export default function PromptCreatePage() {
       instructions: instructions.map((instruction) => instruction.value.trim()),
     };
 
-    console.log("作成:", data);
+    try {
+      const result = await createSkill(data);
+
+      console.log("作成成功:", result);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
