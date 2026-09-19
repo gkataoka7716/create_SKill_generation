@@ -1,6 +1,7 @@
 "use client";
 
-import { Copy, RefreshCw, RotateCcw } from "lucide-react";
+import { Copy, RotateCcw, SquarePen } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type PromptResultPageProps = {
   contents: string;
@@ -9,6 +10,8 @@ type PromptResultPageProps = {
 export default function PromptResultPage({
   contents,
 }: PromptResultPageProps) {
+  const router = useRouter();
+
   // コピー
   const handleCopy = async () => {
     try {
@@ -21,12 +24,18 @@ export default function PromptResultPage({
 
   // 初めからやり直す
   const handleReset = () => {
-    // TODO: 入力画面へ戻り、入力内容をリセットする
+    // 保存している入力内容を削除
+    sessionStorage.removeItem("promptInput");
+
+    // 入力画面へ戻る
+    router.push("/create");
   };
 
-  // 再生成する
-  const handleRegenerate = () => {
-    // TODO: 前回入力した値を使って再度実行する
+  // 再修正する
+  const handleEdit = () => {
+    // 入力内容はsessionStorageに残したまま
+    // 入力画面へ戻る
+    router.push("/create");
   };
 
   return (
@@ -79,14 +88,14 @@ export default function PromptResultPage({
                 初めからやり直す
               </button>
 
-              {/* 再生成する */}
+              {/* 再修正する */}
               <button
                 type="button"
-                onClick={handleRegenerate}
+                onClick={handleEdit}
                 className="flex items-center gap-1.5 rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
-                <RefreshCw size={16} />
-                再生成する
+                <SquarePen size={16} />
+                再修正する
               </button>
             </div>
           </div>
