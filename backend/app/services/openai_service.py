@@ -7,10 +7,9 @@ from openai import OpenAI
 logger = logging.getLogger()
 
 client = OpenAI()
-model = os.getenv("OPENAI_MODEL")
 
 
-def generate_with_openai(prompt: str) -> str:
+def generate_with_openai(prompt: str, model: str) -> str:
     try:
         response = client.responses.create(
             model=model,

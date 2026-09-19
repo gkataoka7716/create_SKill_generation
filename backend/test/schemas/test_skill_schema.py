@@ -12,11 +12,7 @@ from app.schemas.skill_schema import (
 
 
 def create_valid_request(**overrides):
-    data = {
-        "name": "web-research",
-        "description": "Web検索を行うSkill。",
-        "instructions": ["Web検索する"],
-    }
+    data = {"name": "web-research", "description": "Web検索を行うSkill。", "instructions": ["Web検索する"], "ai_provider": "ollama", "ai_model": "llama3.2"}
 
     data.update(overrides)
 
@@ -129,3 +125,87 @@ def test_instructions_validation(instructions, is_valid):
     else:
         with pytest.raises(ValidationError):
             create_valid_request(instructions=instructions)
+
+
+# ------------------------
+#   ai_providerのバリデーション
+# ------------------------
+
+
+@pytest.mark.parametrize(
+    "ai_provider, is_valid",
+    [
+        # 正常系
+        ("openai", True),
+        ("gemini", True),
+        ("ollama", True),
+        # 異常系
+        ("", False),
+        ("invalid", False),
+        ("OpenAI", False),
+        ("open_ai", False),
+    ],
+)
+def test_ai_provider_validation(ai_provider, is_valid):
+    """ai_providerの正常値と異常値をテストする"""
+
+    if is_valid:
+        if ai_provider == "openai":
+            ai_model = "gpt-5.6"
+        elif ai_provider == "gemini":
+            ai_model = "gemini-3.8-flash"
+        else:
+            ai_model = "llama3.2"
+
+        request = create_valid_request(
+            ai_provider=ai_provider,
+            ai_model=ai_model,
+        )
+
+        assert request.ai_provider.value == ai_provider
+
+    else:
+        with pytest.raises(ValidationError):
+            create_valid_request(
+                ai_provider=ai_provider,
+                ai_model="llama3.2",
+            )
+
+
+# ---------------------
+#   ai_modelのバリデーション
+# ---------------------
+
+
+@pytest.mark.parametrize(
+    "ai_provider, ai_model, is_valid",
+    [
+        # OpenAI
+        ("openai", "gpt-5.6", True),
+        ("openai", "invalid-model", False),
+        # Gemini
+        ("gemini", "gemini-3.8-flash", True),
+        ("gemini", "invalid-model", False),
+        # Ollama
+        ("ollama", "llama3.2", True),
+        ("ollama", "invalid-model", False),
+    ],
+)
+def test_ai_model_validation(ai_provider, ai_model, is_valid):
+    """ai_providerに対応したai_modelの正常値と異常値をテストする"""
+
+    if is_valid:
+        request = create_valid_request(
+            ai_provider=ai_provider,
+            ai_model=ai_model,
+        )
+
+        assert request.ai_provider.value == ai_provider
+        assert request.ai_model == ai_model
+
+    else:
+        with pytest.raises(ValidationError):
+            create_valid_request(
+                ai_provider=ai_provider,
+                ai_model=ai_model,
+            )

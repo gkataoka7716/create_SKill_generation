@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.routers import skill_router
 import logging
+from ollama import AsyncClient
 
 logger = logging.getLogger()
 
@@ -40,3 +41,22 @@ app.include_router(
 def root():
     """APIの動作確認用エンドポイント"""
     return {"message": "Skill.md Generator API"}
+
+
+@app.post("/test/ollama")
+async def test_ollama():
+    client = AsyncClient(host="http://ollama:11434")
+
+    response = await client.chat(
+        model="llama3.2",
+        messages=[
+            {
+                "role": "user",
+                "content": "こんにちは。1+1はいくつですか？",
+            }
+        ],
+    )
+
+    return {
+        "response": response["message"]["content"],
+    }

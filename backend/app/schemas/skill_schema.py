@@ -1,6 +1,13 @@
 from typing import Annotated, Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+from app.schemas.ai_schema import (
+    GeminiModel,
+    OllamaModel,
+    OpenAIModel,
+    ProviderType,
+)
 
 
 class SkillGenerateRequest(BaseModel):
@@ -12,11 +19,13 @@ class SkillGenerateRequest(BaseModel):
         pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
         examples=["web-research"],
     )
+
     description: str = Field(
         min_length=1,
         max_length=1024,
         examples=["Web検索を使って情報を調査し、根拠付きで整理するSkill。"],
     )
+
     instructions: list[Annotated[str, Field(min_length=1)]] = Field(
         min_length=1,
         examples=[
@@ -28,6 +37,9 @@ class SkillGenerateRequest(BaseModel):
             ]
         ],
     )
+
+    ai_provider: ProviderType
+    ai_model: str
 
     @field_validator("name", "description", mode="before")
     @classmethod
@@ -44,6 +56,21 @@ class SkillGenerateRequest(BaseModel):
             return [instruction.strip() if isinstance(instruction, str) else instruction for instruction in value]
 
         return value
+
+    @model_validator(mode="after")
+    def validate_ai_model(self):
+        valid_models = {
+            ProviderType.OPENAI: OpenAIModel,
+            ProviderType.GEMINI: GeminiModel,
+            ProviderType.OLLAMA: OllamaModel,
+        }
+
+        model_type = valid_models[self.ai_provider]
+
+        if self.ai_model not in [model.value for model in model_type]:
+            raise ValueError(f"{self.ai_provider.value}では利用できないモデルです: " f"{self.ai_model}")
+
+        return self
 
 
 class SkillGenerateResponse(BaseModel):
