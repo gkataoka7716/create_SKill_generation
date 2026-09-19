@@ -2,69 +2,177 @@
 
 ## 概要
 
-Skill.mdを簡単に作成できるWebアプリケーションです。
+Skill.md Generator は、Skill の名前・説明・手順を入力すると、OpenAI を利用して Skill.md を生成する Web アプリです。
 
-ユーザーはWeb画面上のフォームに必要な情報を入力することで、Skill.mdの内容を作成できます。作成した内容はMarkdown形式でプレビューでき、完成したSkill.mdをファイルとしてダウンロードできます。
+このリポジトリは、バックエンド API とフロントエンドの 2 つで構成されています。
 
-ログインや会員登録は不要で、誰でも利用できるシンプルな構成を想定しています。
+- Backend: FastAPI による API サーバー
+- Frontend: Next.js によるフォーム画面
+
+ユーザーはフロントエンドのフォームに必要事項を入力し、バックエンド API が Skill.md を生成します。
+
+## 構成
+
+- backend
+  - FastAPI API
+  - OpenAI を使った Skill.md 生成
+- frontend
+  - Next.js フロントエンド
+  - 入力フォーム
+  - バリデーション
+  - API 呼び出し
+- docker-compose.dev.yaml
+  - バックエンドのみを起動する開発用設定
 
 ## 主な機能
 
-- Skill.mdの作成
-- Skill.mdの編集
-- Markdownプレビュー
-- 入力内容のバリデーション
-- Skill.mdファイルのダウンロード
+- Skill 名の入力
+- Skill 説明の入力
+- 手順（instructions）の入力
+- フォームのバリデーション
+- OpenAI による Skill.md 生成
+- 生成された Skill.md の取得
 
-## 開発目的
+## 必要な環境
 
-本プロジェクトでは、実際のWebサービス開発を想定し、クライアントからの要望をもとにした要件定義・画面設計・機能設計・実装・テストまでの開発工程を経験することを目的としています。
+- Docker / Docker Compose
+- Node.js / npm
+- OpenAI API Key
 
-## 環境変数の設定
+## 環境変数
 
-プロジェクト直下に `.env` を作成し、以下を設定します。
+### Backend 用
+
+プロジェクト直下の `.env` に以下を設定します。
 
 ```env
 OPENAI_API_KEY=your_api_key
 OPENAI_MODEL=your_model
 ```
 
-`.env` はGitにコミットしないでください。
+- `.env` は Git にコミットしないでください
+- `OPENAI_API_KEY` はバックエンド側で使用されます
+- `OPENAI_MODEL` はバックエンド側の OpenAI モデル名です
 
-## コンテナの起動
+### Frontend 用
 
-プロジェクトルートで以下を実行します。
+フロントエンドの `.env` に以下を設定します。
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000/v1
+```
+
+この値は、フロントエンドがバックエンドの API ベース URL を呼び出すために必要です。
+
+## 起動方法
+
+### 1. Backend の起動
+
+プロジェクトルートで実行します。
 
 ```bash
 docker compose -f docker-compose.dev.yaml up -d --build
 ```
 
-## 起動確認
+これにより FastAPI が `http://localhost:8000` で起動します。
 
-FastAPIのSwagger UIにアクセスします。
+### 2. Frontend の起動
 
-[http://localhost:8000/docs](http://localhost:8000/docs)
+別途、フロントエンド側を起動します。
 
-## Blackの実行
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+デフォルトでは `http://localhost:3000` で起動します。
+
+## 動作確認
+
+### Backend API の確認
+
+FastAPI の Swagger UI にアクセスします。
+
+- http://localhost:8000/docs
+
+また、ヘルスチェック用エンドポイント:
+
+- http://localhost:8000/health
+
+### Frontend の確認
+
+- http://localhost:3000
+
+ルートページは `/create` へリダイレクトされます。
+
+## API 仕様
+
+### POST /v1/skills/generate
+
+Skill.md を生成します。
+
+### リクエスト例
+
+```json
+{
+  "name": "web-research",
+  "description": "Web検索を使って情報を調査し、根拠付きで整理するSkill。",
+  "instructions": [
+    "ユーザーの質問を確認する",
+    "必要な情報をWeb検索する",
+    "複数の情報源を比較する",
+    "根拠を示して回答する"
+  ]
+}
+```
+
+### バリデーション
+
+- `name`
+  - 1〜64文字
+  - 小文字英字・数字・ハイフンのみ
+  - 先頭・末尾・連続したハイフンは不可
+
+- `description`
+  - 1〜1024文字
+
+- `instructions`
+  - 1件以上必須
+  - 各項目は1文字以上
+
+### レスポンス例
+
+```json
+{
+  "content": "---\nname: web-research\n..."
+}
+```
+
+## 開発用コマンド
+
+### Backend
 
 ```bash
 docker compose -f docker-compose.dev.yaml exec backend black .
-```
-
-## pytestの実行
-
-```bash
 docker compose -f docker-compose.dev.yaml exec backend pytest
 ```
 
-## コンテナの停止
+### Frontend
+
+```bash
+cd frontend
+npm run lint
+npm run build
+```
+
+## 停止
 
 ```bash
 docker compose -f docker-compose.dev.yaml down
 ```
 
-## コンテナの再起動
+## 補足
 
-```bash
-docker compose -f docker-compose.dev.yaml restart backend
-```
+このリポジトリでは、バックエンドとフロントエンドが分離した構成です。
+Docker Compose はバックエンドだけを起動するため、開発時はフロントエンドも別途起動してください。
